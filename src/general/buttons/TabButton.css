@@ -1,0 +1,92 @@
+/* TabButton - Toggle and Switch Actions */
+.btn-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  box-sizing: border-box;
+  background: transparent;
+  color: #6b7280;
+  position: relative;
+}
+
+/* Sizes */
+.btn-tab--small {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  min-height: 2rem;
+}
+
+.btn-tab--medium {
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  min-height: 2.5rem;
+}
+
+.btn-tab--large {
+  padding: 1rem 1.25rem;
+  font-size: 1rem;
+  min-height: 3rem;
+}
+
+/* States */
+.btn-tab:hover:not(:disabled):not(.btn-tab--active) {
+  background: rgba(0, 123, 255, 0.1);
+  color: #374151;
+}
+
+.btn-tab:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3);
+}
+
+.btn-tab:disabled {
+  color: #d1d5db;
+  cursor: not-allowed;
+}
+
+/* Active State */
+.btn-tab--active {
+  background: white;
+  color: #007bff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-bottom: 2px solid #007bff;
+}
+
+.btn-tab--active:hover {
+  background: white;
+  color: #007bff;
+}
+
+/* When used in a tab group container */
+.tab-group {
+  display: flex;
+  background: #f3f4f6;
+  border-radius: 8px;
+  padding: 4px;
+  gap: 2px;
+}
+
+.tab-group .btn-tab {
+  flex: 1;
+  border-radius: 4px;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .btn-tab {
+    transition: none;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .btn-tab--active {
+    border: 2px solid #007bff;
+  }
+}

@@ -1,0 +1,16 @@
+/* CoursesPanel.css - Panel-specific styles only */
+
+/* Course card customization for dashboard */
+.courses-panel .course-card--standard {
+  padding: 8px;
+}
+
+.courses-panel .course-card--standard .course-card__title {
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+
+.courses-panel .course-card__stats {
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+}

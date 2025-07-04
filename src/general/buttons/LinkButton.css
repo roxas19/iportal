@@ -1,0 +1,57 @@
+/* LinkButton - Text-based Navigation */
+.btn-link {
+  display: inline;
+  border: none;
+  background: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  font-family: inherit;
+  color: #007bff;
+  padding: 0;
+}
+
+/* Sizes */
+.btn-link--small {
+  font-size: 0.75rem;
+}
+
+.btn-link--medium {
+  font-size: 0.875rem;
+}
+
+.btn-link--large {
+  font-size: 1rem;
+}
+
+/* States */
+.btn-link:hover:not(:disabled) {
+  color: #0056cc;
+  text-decoration: underline;
+}
+
+.btn-link:active:not(:disabled) {
+  color: #004085;
+}
+
+.btn-link:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+.btn-link:disabled {
+  color: #c7c7cc;
+  cursor: not-allowed;
+}
+
+.btn-link:disabled:hover {
+  text-decoration: none;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .btn-link {
+    transition: none;
+  }
+}

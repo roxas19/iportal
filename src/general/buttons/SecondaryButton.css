@@ -1,0 +1,77 @@
+/* SecondaryButton - Secondary Actions */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #007bff;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  font-family: inherit;
+  box-sizing: border-box;
+  background: transparent;
+  color: #007bff;
+}
+
+/* Sizes */
+.btn-secondary--small {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  min-height: 2rem;
+}
+
+.btn-secondary--medium {
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  min-height: 2.5rem;
+}
+
+.btn-secondary--large {
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  min-height: 3rem;
+}
+
+/* States */
+.btn-secondary:hover:not(:disabled) {
+  background: rgba(0, 123, 255, 0.1);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.15);
+}
+
+.btn-secondary:active:not(:disabled) {
+  transform: translateY(0);
+  background: rgba(0, 123, 255, 0.15);
+}
+
+.btn-secondary:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3);
+}
+
+.btn-secondary:disabled {
+  border-color: #c7c7cc;
+  color: #c7c7cc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-secondary:disabled:hover {
+  background: transparent;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .btn-secondary {
+    transition: none;
+    transform: none;
+  }
+  
+  .btn-secondary:hover:not(:disabled),
+  .btn-secondary:active:not(:disabled) {
+    transform: none;
+  }
+}

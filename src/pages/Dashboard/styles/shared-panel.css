@@ -1,0 +1,130 @@
+/* Shared Panel Styles for Dashboard Components */
+
+/* Base Panel Structure */
+.panel-base {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  height: 500px;
+  animation: fadeIn 0.3s ease;
+}
+
+/* Panel Header */
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  min-height: 3.5rem; /* Reduced from 4rem */
+  box-sizing: border-box;
+}
+
+.panel-header h2 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+  line-height: 1.2;
+  flex: 1; /* Allow title to take available space */
+}
+
+/* Panel Content */
+.panel-content {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Panel Footer */
+.panel-footer {
+  padding: 0.75rem 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
+  display: flex;
+  justify-content: center;
+}
+
+/* Loading State */
+.panel-loading {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+}
+
+/* Empty State */
+.panel-empty-state {
+  text-align: center;
+  padding: 3rem 2rem;
+}
+
+.panel-empty-state p {
+  color: #6b7280;
+  margin-bottom: 1rem;
+}
+
+/* List Styling */
+.panel-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.panel-list--loading {
+  opacity: 0.7;
+  transform: translateY(4px);
+}
+
+/* Header Action Button */
+.panel-header-action {
+  font-size: 0.75rem;
+  padding: 0.375rem 0.75rem;
+  min-height: 2rem; /* Ensure consistent button height */
+  min-width: 5rem; /* Prevent layout shifts from text length */
+  box-sizing: border-box;
+  flex-shrink: 0; /* Prevent button from shrinking */
+  width: auto !important; /* Override button--primary width: 100% */
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .panel-base {
+    margin-bottom: 1rem;
+  }
+  
+  .panel-list {
+    gap: 0.75rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .panel-header {
+    padding: 0.75rem 1rem;
+  }
+  
+  .panel-content {
+    padding: 0.75rem;
+  }
+  
+  .panel-footer {
+    padding: 0.75rem 1rem;
+  }
+}

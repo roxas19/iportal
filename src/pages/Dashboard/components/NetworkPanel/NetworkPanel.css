@@ -1,0 +1,15 @@
+/* NetworkPanel.css - Panel-specific styles only */
+
+/* Section headers within the panel */
+.network-panel__section h3 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1f2937;
+  transition: color 0.2s ease;
+}
+
+/* Contact list with reduced gap for compact display */
+.network-panel__contacts {
+  gap: 0.5rem;
+}
