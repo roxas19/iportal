@@ -22,14 +22,13 @@ AuthPage/
 ```
 
 ### **Shared Components Used**
-- Direct styling integration for form container
-- `Input` - Form inputs with labels, validation, and error states
+- Direct styling integration for form container and inputs
 - New button components - Primary submit buttons and link-style nav buttons
 
 **Import paths:**
 ```javascript
 import { PrimaryButton, LinkButton } from '../../general/buttons';
-import Input from '../../components/ui/Input/Input.js';
+// Form inputs are now integrated directly into the component
 ```
 
 ## ✨ Features

@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { IconButton, PrimaryButton, SecondaryButton } from '../../../../general/buttons';
 import CourseCard from '../../../../general/courses/CourseCard/CourseCard';
+import CourseCreateModal from '../../../../general/courses/CourseCreateModal/CourseCreateModal';
 import '../../styles/shared-panel.css';
 import './CoursesPanel.css';
 
@@ -15,10 +16,22 @@ import './CoursesPanel.css';
  * 
  * Uses shared panel styles for consistency with NetworkPanel.
  */
-const CoursesPanel = ({ courses = [], loading = false }) => {
+const CoursesPanel = ({ courses = [], loading = false, onCourseCreated }) => {
+  const [showCreateModal, setShowCreateModal] = useState(false);
+
   const handleCreateCourse = () => {
-    // TODO: Navigate to course creation or open modal
-    console.log('Create new course');
+    setShowCreateModal(true);
+  };
+
+  const handleCloseCreateModal = () => {
+    setShowCreateModal(false);
+  };
+
+  const handleCourseCreated = (newCourse) => {
+    if (onCourseCreated) {
+      onCourseCreated(newCourse);
+    }
+    setShowCreateModal(false);
   };
 
   const handleViewCourse = (courseId) => {
@@ -89,6 +102,13 @@ const CoursesPanel = ({ courses = [], loading = false }) => {
           View All Courses
         </SecondaryButton>
       </div>
+
+      {/* Course Creation Modal */}
+      <CourseCreateModal
+        isOpen={showCreateModal}
+        onClose={handleCloseCreateModal}
+        onCourseCreated={handleCourseCreated}
+      />
     </div>
   );
 };

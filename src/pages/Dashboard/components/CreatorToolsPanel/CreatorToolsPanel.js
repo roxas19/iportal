@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import CourseCreateModal from '../../../../general/courses/CourseCreateModal/CourseCreateModal';
 import './CreatorToolsPanel.css';
 
 /**
@@ -16,8 +17,10 @@ import './CreatorToolsPanel.css';
 const CreatorToolsPanel = ({ 
   quickActions = [], 
   onQuickAction, 
-  recentActions = [] 
+  recentActions = [],
+  onCourseCreated 
 }) => {
+  const [showCreateModal, setShowCreateModal] = useState(false);
   
   // Creator-specific tools
   const creatorTools = [
@@ -66,11 +69,24 @@ const CreatorToolsPanel = ({
   ];
 
   const handleToolClick = (toolId) => {
-    if (onQuickAction) {
+    if (toolId === 'create-course') {
+      setShowCreateModal(true);
+    } else if (onQuickAction) {
       onQuickAction(toolId);
     } else {
       console.log('Creator tool clicked:', toolId);
     }
+  };
+
+  const handleCloseCreateModal = () => {
+    setShowCreateModal(false);
+  };
+
+  const handleCourseCreated = (newCourse) => {
+    if (onCourseCreated) {
+      onCourseCreated(newCourse);
+    }
+    setShowCreateModal(false);
   };
 
   const getToolColorClass = (color) => {
@@ -126,6 +142,13 @@ const CreatorToolsPanel = ({
           </div>
         )}
       </div>
+
+      {/* Course Creation Modal */}
+      <CourseCreateModal
+        isOpen={showCreateModal}
+        onClose={handleCloseCreateModal}
+        onCourseCreated={handleCourseCreated}
+      />
     </div>
   );
 };

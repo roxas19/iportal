@@ -49,7 +49,7 @@ components/
 ```javascript
 // Always use explicit file paths
 import { PrimaryButton, SecondaryButton } from '../../buttons';
-import Input from '../../components/ui/Input/Input.js';
+// Form inputs are now integrated directly into components
 ```
 
 ### Component Hierarchy
@@ -84,7 +84,7 @@ ComponentName/
 ```javascript
 // Always use explicit file paths
 import { PrimaryButton, SecondaryButton } from '../../buttons';
-import Input from '../../components/ui/Input/Input.js';
+// Form inputs are now integrated directly into components
 ```
 
 ### Props and API Design

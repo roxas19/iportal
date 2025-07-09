@@ -1,0 +1,118 @@
+/* Course Create Modal Specific Styles */
+.course-create-modal .form-modal {
+  max-width: 600px;
+  width: 95%;
+}
+
+.course-create-modal .form-modal-title {
+  color: var(--primary-color, #007bff);
+  margin-bottom: 0.5rem;
+}
+
+.course-create-modal .form-modal-subtitle {
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+/* Course specific field styling */
+.course-create-modal .input-group {
+  margin-bottom: 1.25rem;
+}
+
+.course-create-modal .textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.course-create-modal .file-input {
+  padding: 1rem;
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.course-create-modal .file-input:hover {
+  border-color: var(--primary-color, #007bff);
+  background-color: #e3f2fd;
+}
+
+.course-create-modal .file-input:focus {
+  outline: none;
+  border-color: var(--primary-color, #007bff);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+/* Help text styling */
+.course-create-modal .input-help {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 0.25rem;
+  font-style: italic;
+}
+
+/* Actions styling */
+.course-create-modal .form-actions {
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.course-create-modal .form-actions button {
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  border-radius: 6px;
+}
+
+/* Loading state */
+.course-create-modal .form-modal.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .course-create-modal .form-modal {
+    max-width: 100%;
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+  
+  .course-create-modal .form-actions {
+    flex-direction: column;
+  }
+  
+  .course-create-modal .form-actions button {
+    width: 100%;
+  }
+}
+
+/* Error styling enhancements */
+.course-create-modal .error-banner {
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  font-weight: 500;
+}
+
+.course-create-modal .input-error {
+  color: #dc2626;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  font-weight: 500;
+}
+
+/* Success animation (if needed) */
+.course-create-modal .success-message {
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}

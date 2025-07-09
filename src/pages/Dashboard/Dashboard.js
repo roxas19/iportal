@@ -1,5 +1,5 @@
 import React from 'react';
-import { useDashboard } from './hooks/useDashboard';
+import { useInstructorDashboard } from './hooks/useInstructorDashboard';
 import CoursesPanel from './components/CoursesPanel/CoursesPanel';
 import NetworkPanel from './components/NetworkPanel/NetworkPanel';
 import CreatorToolsPanel from './components/CreatorToolsPanel/CreatorToolsPanel';
@@ -18,10 +18,10 @@ import './Dashboard.css';
  * This follows our page-centric architecture where:
  * - Page-specific components are in ./components/
  * - Shared/reusable components are in /src/general/
- * - State management is handled through useDashboard hook
+ * - State management is handled through useInstructorDashboard hook
  */
 const Dashboard = () => {
-  const dashboardData = useDashboard();
+  const dashboardData = useInstructorDashboard();
 
   return (
     <div className="dashboard">
@@ -30,6 +30,7 @@ const Dashboard = () => {
         <CoursesPanel 
           courses={dashboardData.courses}
           loading={dashboardData.loading}
+          onCourseCreated={dashboardData.handleCourseCreated}
         />
         
         {/* Right Panel - Network */}
@@ -47,6 +48,7 @@ const Dashboard = () => {
         quickActions={dashboardData.quickActions}
         onQuickAction={dashboardData.handleQuickAction}
         recentActions={dashboardData.recentActions}
+        onCourseCreated={dashboardData.handleCourseCreated}
       />
     </div>
   );
