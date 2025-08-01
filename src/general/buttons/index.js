@@ -1,4 +1,4 @@
-// Button System - 5 Professional Button Types
+// Button System - 6 Professional Button Types
 // Import all button components from a single location
 
 export { default as PrimaryButton } from './PrimaryButton';
@@ -6,6 +6,7 @@ export { default as SecondaryButton } from './SecondaryButton';
 export { default as LinkButton } from './LinkButton';
 export { default as TabButton } from './TabButton';
 export { default as IconButton } from './IconButton';
+export { default as ViewButton } from './ViewButton';
 
 /**
  * BUTTON USAGE GUIDE FOR AI AGENTS
@@ -34,4 +35,9 @@ export { default as IconButton } from './IconButton';
  *    - Use for: Header buttons, compact spaces, with/without icons
  *    - Features: 3 variants (primary/secondary/ghost), compact design
  *    - Example: <IconButton variant="primary" size="small">+ Course</IconButton>
+ * 
+ * 6. ViewButton - Specialized view action button
+ *    - Use for: View details, open content, navigate to detail pages
+ *    - Features: Primary/secondary variants, consistent "View" styling
+ *    - Example: <ViewButton size="small" onClick={handleView}>View Course</ViewButton>
  */

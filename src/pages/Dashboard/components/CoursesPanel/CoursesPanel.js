@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { IconButton, PrimaryButton, SecondaryButton } from '../../../../general/buttons';
 import CourseCard from '../../../../general/courses/CourseCard/CourseCard';
 import CourseCreateModal from '../../../../general/courses/CourseCreateModal/CourseCreateModal';
@@ -16,8 +17,9 @@ import './CoursesPanel.css';
  * 
  * Uses shared panel styles for consistency with NetworkPanel.
  */
-const CoursesPanel = ({ courses = [], loading = false, onCourseCreated }) => {
+const CoursesPanel = ({ courses = [], courseStats = {}, loading = false, onCourseCreated }) => {
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const navigate = useNavigate();
 
   const handleCreateCourse = () => {
     setShowCreateModal(true);
@@ -35,13 +37,11 @@ const CoursesPanel = ({ courses = [], loading = false, onCourseCreated }) => {
   };
 
   const handleViewCourse = (courseId) => {
-    // TODO: Navigate to course detail page
-    console.log('Navigate to course:', courseId);
+    navigate(`/course/${courseId}`);
   };
 
   const handleViewAllCourses = () => {
-    // TODO: Navigate to full courses page
-    console.log('Navigate to all courses page');
+    navigate('/courses');
   };
 
   if (loading) {
@@ -80,17 +80,23 @@ const CoursesPanel = ({ courses = [], loading = false, onCourseCreated }) => {
             </PrimaryButton>
           </div>
         ) : (
-          <div className="panel-list">
-            {courses.slice(0, 3).map(course => (
-              <CourseCard
-                key={course.id}
-                course={course}
-                size="standard"
-                showActions={false}
-                onClick={handleViewCourse}
-              />
-            ))}
-          </div>
+          <>
+            {/* Recent Courses Section */}
+            <div className="courses-panel__section">
+              <h3>Recent Courses <span className="course-count">({courseStats?.total_courses || courses.length} total)</span></h3>
+              <div className="panel-list">
+                {courses.slice(0, 3).map(course => (
+                  <CourseCard
+                    key={course.id}
+                    course={course}
+                    showActions={true}
+                    onView={handleViewCourse}
+                    onClick={handleViewCourse}
+                  />
+                ))}
+              </div>
+            </div>
+          </>
         )}
       </div>
       

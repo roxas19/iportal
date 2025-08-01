@@ -1,8 +1,28 @@
 /* CoursesPanel.css - Panel-specific styles only */
 
+/* Section headers within the panel */
+.courses-panel__section h3 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1f2937;
+  transition: color 0.2s ease;
+}
+
+/* Course count styling */
+.courses-panel__section .course-count {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #6b7280;
+  margin-left: 0.5rem;
+}
+
 /* Course card customization for dashboard */
+
+/* Increase height by 20% for standard cards */
 .courses-panel .course-card--standard {
   padding: 8px;
+  min-height: calc(1.7 * 56px); /* Double the original height (assumed 56px) */
 }
 
 .courses-panel .course-card--standard .course-card__title {

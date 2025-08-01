@@ -60,28 +60,12 @@ const CourseCreateModal = ({ isOpen, onClose, onCourseCreated }) => {
       placeholder: 'Select a category',
       required: true,
       options: categories.map(cat => ({
-        value: cat.id,
+        value: cat.name,
         label: cat.name
       })),
       validation: {
         required: true,
         requiredMessage: 'Please select a category'
-      }
-    },
-    {
-      name: 'level',
-      label: 'Course Level',
-      type: 'select',
-      placeholder: 'Select course level',
-      required: true,
-      options: [
-        { value: 'beginner', label: 'Beginner' },
-        { value: 'intermediate', label: 'Intermediate' },
-        { value: 'advanced', label: 'Advanced' }
-      ],
-      validation: {
-        required: true,
-        requiredMessage: 'Please select a course level'
       }
     },
     {
@@ -138,7 +122,6 @@ const CourseCreateModal = ({ isOpen, onClose, onCourseCreated }) => {
       submitData.append('title', formData.title);
       submitData.append('description', formData.description);
       submitData.append('category', formData.category);
-      submitData.append('level', formData.level);
       
       // Add optional fields if provided
       if (formData.image) {

@@ -1,0 +1,48 @@
+/* App.css - Main app layout */
+
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Main content area - accounts for fixed header */
+.main-content {
+  flex: 1;
+  /* Header is 64px on desktop, 56px on mobile */
+  padding-top: 64px;
+  min-height: calc(100vh - 64px);
+  
+  /* Smooth transition for content */
+  transition: padding-top 0.3s ease;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .main-content {
+    padding-top: 56px;
+    min-height: calc(100vh - 56px);
+  }
+}
+
+/* Ensure content is properly spaced */
+.main-content > * {
+  width: 100%;
+  /* Remove max-width constraint - let pages handle their own width */
+  /* max-width: 1200px; */
+  margin: 0 auto;
+  /* Remove global padding - let pages handle their own padding */
+  /* padding: 0 16px; */
+}
+
+/* Page-specific adjustments */
+.main-content .page-container {
+  padding: 24px 0;
+}
+
+/* Mobile page container */
+@media (max-width: 768px) {
+  .main-content .page-container {
+    padding: 16px 0;
+  }
+}

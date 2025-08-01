@@ -1,11 +1,11 @@
 # ContactCard Component
 
-A reusable card component for displaying contact information in the Django React Platform. The ContactCard can handle both platform users (users registered on the platform) and manual contacts (contacts added manually by users).
+A simple, reusable card component for displaying contact information in the Django React Platform. The ContactCard handles both platform users (users registered on the platform) and manual contacts (contacts added manually by users) with context-based styling.
 
 ## Features
 
 - **Dual Contact Type Support**: Visually distinguishes between platform users and manual contacts
-- **Flexible Sizing**: Supports 'compact' and 'full' size variants
+- **Context-Based Sizing**: Automatically adapts size based on parent container (like CourseCard)
 - **Connection Status**: Shows connection status for platform users (connected, pending, etc.)
 - **Responsive Design**: Adapts to different screen sizes
 - **Accessibility**: Supports high contrast mode and reduced motion preferences
@@ -43,11 +43,9 @@ const manualContact = {
   connection_status: 'not_connected'
 };
 
-// Basic Usage
+// Basic Usage - Size determined by parent container
 <ContactCard
   contact={platformContact}
-  size="compact"
-  onView={(contact) => console.log('View:', contact)}
   onConnect={(contact) => console.log('Connect:', contact)}
   onMessage={(contact) => console.log('Message:', contact)}
 />
@@ -58,10 +56,31 @@ const manualContact = {
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `contact` | Object | - | **Required.** Contact data object |
-| `size` | String | `'full'` | Card size: `'compact'` or `'full'` |
 | `onConnect` | Function | - | Callback when connect/send connection button is clicked |
 | `onMessage` | Function | - | Callback when message button is clicked |
 | `showActions` | Boolean | `true` | Whether to show action buttons |
+
+## Context-Based Sizing
+
+The ContactCard automatically adapts its size based on the parent container:
+
+### Dashboard Panel (Compact)
+```jsx
+<div className="panel-list">
+  <ContactCard contact={contact} onConnect={handleConnect} />
+</div>
+```
+- 32px avatar, smaller fonts, condensed layout
+- Used in NetworkPanel (Dashboard right panel)
+
+### Network Page (Full)
+```jsx  
+<div className="contacts-grid">
+  <ContactCard contact={contact} onConnect={handleConnect} />
+</div>
+```
+- 48px avatar, full details, connection status badges
+- Used in main Network page
 
 ## Contact Object Structure
 
@@ -104,14 +123,14 @@ const manualContact = {
 - Smaller avatar (32px)
 - Condensed layout
 - Smaller buttons
-- Contact type indicator instead of detailed info
+- Shows actual contact details (email/phone) instead of contact type indicator
 - Ideal for dashboard panels and lists
 
 ### Full
 - Larger avatar (48px)
 - Full contact details
 - Regular-sized buttons
-- Complete information display
+- Complete information display including connection status
 - Ideal for contact pages and detailed views
 
 ## Connection Status

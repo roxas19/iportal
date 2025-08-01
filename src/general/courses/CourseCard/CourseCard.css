@@ -1,6 +1,5 @@
-/* CourseCard Styles */
+/* CourseCard - Simple, context-styled component */
 .course-card {
-  /* Base card styling */
   background: var(--bg-secondary);
   border-radius: var(--radius-lg);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
@@ -25,41 +24,62 @@
   box-shadow: 0 4px 12px rgba(0, 122, 255, 0.15);
 }
 
-.course-card--compact {
-  padding: 12px;
+.course-card__header {
+  margin-bottom: var(--space-2);
 }
 
-.course-card--compact .course-card__title {
-  font-size: 1rem;
+.course-card__title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--space-1) 0;
+  line-height: 1.4;
+}
+
+.course-card__stats {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.course-card__students {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.course-card__actions {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: auto;
+}
+
+/* Dashboard Panel Context - Horizontal Layout */
+.panel-list .course-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  min-height: 5.4rem; /* 20% taller than default ~4rem */
+}
+
+.panel-list .course-card__header {
+  flex: 1;
   margin-bottom: 0;
 }
 
-.course-card--full {
-  padding: 24px;
+.panel-list .course-card__stats {
+  margin-bottom: 0;
+  flex-shrink: 0;
 }
 
-.course-card--full .course-card__title {
-  font-size: 1.3rem;
-  margin-bottom: 16px;
-}
-
-.course-card--full .course-card__stats {
-  margin-bottom: 20px;
-}
-
-/* Style Variants */
-.course-card--featured {
-  border: 2px solid #007bff;
-  background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
-}
-
-.course-card--enrolled {
-  border-left: 4px solid #28a745;
-  background-color: #f8fff9;
-}
-
-.course-card--enrolled .course-card__title {
-  color: #1e7e34;
+.panel-list .course-card__actions {
+  margin-top: 0;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 /* Responsive Design */
@@ -76,5 +96,16 @@
   
   .course-card__actions button {
     width: 100%;
+  }
+  
+  /* Stack vertically on mobile */
+  .panel-list .course-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .panel-list .course-card__actions {
+    margin-left: 0;
+    margin-top: var(--space-2);
   }
 }

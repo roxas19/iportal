@@ -5,14 +5,17 @@ import './NetworkStats.css';
  * NetworkStats - A reusable component for displaying network statistics
  * 
  * Props:
- * - stats: Object containing network statistics
+ * - stats: Object containing network statistics with STANDARDIZED keys:
+ *   - total: Total contacts count
+ *   - platform: Platform connections count  
+ *   - manual: Manual contacts count
  * - size: 'compact' | 'standard' | 'full' | 'dashboard' | 'minimal' (default: 'standard')
  * - variant: 'default' | 'featured' (default: 'default')
  * - interactive: boolean - Makes stat cards clickable (default: false)
  * - activeFilter: 'all' | 'platform' | 'manual' - Active filter state
  * - onFilterChange: function - Callback when filter is clicked
  */
-const NetworkStats = ({ 
+const NetworkStats = React.memo(({ 
   stats = {},
   size = 'standard',
   variant = 'default',
@@ -20,11 +23,24 @@ const NetworkStats = ({
   activeFilter = 'all',
   onFilterChange
 }) => {
+  // STANDARDIZED prop interface - always expect these keys
   const {
-    allContacts = 0,
-    platformConnections = 0,
-    manualContacts = 0
+    total = 0,
+    platform = 0,
+    manual = 0,
+    // Legacy support for different prop names (to be phased out)
+    allContacts = total,
+    platformConnections = platform,
+    manualContacts = manual,
+    totalContacts = total
   } = stats;
+
+  // Use standardized values, falling back to legacy names
+  const finalCounts = {
+    all: total || allContacts || totalContacts || 0,
+    platform: platform || platformConnections || 0,
+    manual: manual || manualContacts || 0
+  };
 
   const cardClasses = [
     'network-stats',
@@ -77,7 +93,7 @@ const NetworkStats = ({
           aria-label={interactive ? 'Filter by all contacts' : undefined}
           aria-pressed={interactive && activeFilter === 'all' ? 'true' : 'false'}
         >
-          <span className="stat-number">{allContacts}</span>
+          <span className="stat-number">{finalCounts.all}</span>
           <span className="stat-label">All Contacts</span>
         </div>
         
@@ -90,7 +106,7 @@ const NetworkStats = ({
           aria-label={interactive ? 'Filter by platform connections' : undefined}
           aria-pressed={interactive && activeFilter === 'platform' ? 'true' : 'false'}
         >
-          <span className="stat-number">{platformConnections}</span>
+          <span className="stat-number">{finalCounts.platform}</span>
           <span className="stat-label">Platform Connections</span>
         </div>
         
@@ -103,12 +119,15 @@ const NetworkStats = ({
           aria-label={interactive ? 'Filter by manual contacts' : undefined}
           aria-pressed={interactive && activeFilter === 'manual' ? 'true' : 'false'}
         >
-          <span className="stat-number">{manualContacts}</span>
+          <span className="stat-number">{finalCounts.manual}</span>
           <span className="stat-label">Manual Contacts</span>
         </div>
       </div>
     </div>
   );
-};
+});
+
+// Add display name for debugging
+NetworkStats.displayName = 'NetworkStats';
 
 export default NetworkStats;

@@ -3,28 +3,19 @@ import { PrimaryButton, SecondaryButton } from '../../buttons';
 import './ContactCard.css';
 
 /**
- * ContactCard Component
+ * ContactCard - Simple, context-styled component
  * 
  * A reusable card component for displaying contact information
  * Supports both platform users and manual contacts with visual distinction
  * 
  * Props:
  * @param {Object} contact - Contact data object
- * @param {string} contact.id - Contact ID
- * @param {string} contact.name - Contact name
- * @param {string} contact.email - Contact email
- * @param {string} contact.phone_number - Contact phone (for manual contacts)
- * @param {boolean} contact.is_platform_user - Whether contact is a platform user
- * @param {Object} contact.platform_user - Platform user data (if is_platform_user is true)
- * @param {string} contact.connection_status - Connection status for platform users
- * @param {string} size - Card size: 'compact' | 'full' (default: 'full')
  * @param {Function} onConnect - Callback when connect/send connection button is clicked (platform users only)
  * @param {Function} onMessage - Callback when message button is clicked (platform users only)
  * @param {boolean} showActions - Whether to show action buttons (default: true)
  */
 const ContactCard = ({
   contact,
-  size = 'full',
   onConnect,
   onMessage,
   showActions = true
@@ -102,7 +93,7 @@ const ContactCard = ({
   };
 
   return (
-    <div className={`contact-card ${size} ${isPlatformUser ? 'platform-user' : 'manual-contact'}`}>
+    <div className={`contact-card ${isPlatformUser ? 'platform-user' : 'manual-contact'}`}>
       {/* Avatar */}
       <div className="contact-avatar">
         {platformUserData?.profile_photo ? (
@@ -130,20 +121,19 @@ const ContactCard = ({
           {finalDisplayName}
         </div>
         
-        {size === 'full' && (
-          <div className="contact-details">
-            {finalDisplayEmail && (
-              <div className="contact-email" title={finalDisplayEmail}>
-                {finalDisplayEmail}
-              </div>
-            )}
-            {!isPlatformUser && displayPhone && (
-              <div className="contact-phone" title={displayPhone}>
-                {displayPhone}
-              </div>
-            )}
-          </div>
-        )}
+        {/* Contact Details - always shown */}
+        <div className="contact-details">
+          {finalDisplayEmail && (
+            <div className="contact-email" title={finalDisplayEmail}>
+              {finalDisplayEmail}
+            </div>
+          )}
+          {!isPlatformUser && displayPhone && (
+            <div className="contact-phone" title={displayPhone}>
+              {displayPhone}
+            </div>
+          )}
+        </div>
 
         {/* Connection Status for Platform Users */}
         {isPlatformUser && connectionStatus && (
@@ -151,22 +141,15 @@ const ContactCard = ({
             {connectionStatus.text}
           </div>
         )}
-
-        {/* Contact Type Indicator for compact size */}
-        {size === 'compact' && (
-          <div className="contact-type">
-            {isPlatformUser ? 'Platform User' : 'Manual Contact'}
-          </div>
-        )}
       </div>
 
-      {/* Actions */}
+      {/* Actions - only for platform users */}
       {showActions && isPlatformUser && (
         <div className="contact-actions">
           {/* Send Connection Request */}
           {connection_status === 'not_connected' && (
             <PrimaryButton
-              size={size === 'compact' ? 'small' : 'medium'}
+              size="small"
               onClick={handleConnect}
               className="connect-btn"
             >
@@ -177,7 +160,7 @@ const ContactCard = ({
           {/* Accept Connection Request */}
           {connection_status === 'pending_received' && (
             <PrimaryButton
-              size={size === 'compact' ? 'small' : 'medium'}
+              size="small"
               onClick={handleConnect}
               className="accept-btn"
             >
@@ -188,15 +171,13 @@ const ContactCard = ({
           {/* Message Action (only for connected users) */}
           {connection_status === 'connected' && (
             <SecondaryButton
-              size={size === 'compact' ? 'small' : 'medium'}
+              size="small"
               onClick={handleMessage}
               className="message-btn"
             >
               Message
             </SecondaryButton>
           )}
-
-          {/* No actions for pending_sent - just show status */}
         </div>
       )}
     </div>

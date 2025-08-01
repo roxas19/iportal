@@ -1,0 +1,49 @@
+/* UnitsSection Component Styles */
+
+/* Base styles inherited from .course-section in CourseDetail.css */
+
+.unit-item {
+  position: relative;
+  transition: all 0.2s ease-in-out;
+}
+
+.unit-item:hover {
+  transform: translateY(-2px);
+}
+
+.item-title-section {
+  flex: 1;
+  min-width: 0;
+}
+
+.unit-order {
+  font-weight: 600;
+  color: var(--accent);
+  margin-right: var(--space-1);
+}
+
+.unit-tasks,
+.unit-resources,
+.unit-session,
+.unit-created {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+/* Responsive adjustments for units */
+@media (max-width: 768px) {
+  .item-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+  }
+  
+  .unit-tasks,
+  .unit-resources,
+  .unit-session,
+  .unit-created {
+    font-size: 0.75rem;
+  }
+}

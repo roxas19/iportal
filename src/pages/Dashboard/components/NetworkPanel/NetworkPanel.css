@@ -13,3 +13,18 @@
 .network-panel__contacts {
   gap: 0.5rem;
 }
+
+/* Show more hint styling */
+.network-panel__show-more {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e5e7eb;
+  text-align: center;
+}
+
+.show-more-hint {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+  font-style: italic;
+}

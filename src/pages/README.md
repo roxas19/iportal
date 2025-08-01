@@ -22,6 +22,16 @@ This is the **main navigation hub** for all application features. Each page repr
 - **Purpose**: User dashboard after login
 - **Status**: ✅ MVP complete
 
+### **Network/**
+- **URL**: `/network`
+- **Purpose**: Contact and connection management
+- **Status**: ✅ Production ready
+
+### **Courses/**
+- **URL**: `/courses`
+- **Purpose**: Course management and creation
+- **Status**: ✅ MVP complete
+
 ## 🏗️ Page Structure Template
 
 Each page folder should contain:

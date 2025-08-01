@@ -1,0 +1,47 @@
+/* CourseGoalsSection Component Styles */
+
+/* Base styles inherited from .course-section in CourseDetail.css */
+
+.goal-item {
+  position: relative;
+  transition: all 0.2s ease-in-out;
+}
+
+.goal-item:hover {
+  transform: translateY(-1px);
+}
+
+.goal-icon {
+  margin-right: var(--space-1);
+  font-size: 1.2em;
+}
+
+.goal-type {
+  background: #e1f5fe;
+  color: #0277bd;
+}
+
+.goal-order,
+.goal-created {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+/* Goal completion styles (for future student view) */
+.goal-completed {
+  opacity: 0.7;
+  text-decoration: line-through;
+}
+
+.goal-completion-toggle {
+  margin-left: auto;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .goal-icon {
+    margin-right: 4px;
+  }
+}

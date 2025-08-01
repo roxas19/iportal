@@ -1,16 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { IconButton, PrimaryButton, SecondaryButton } from '../../../../general/buttons';
 import NetworkStats from '../../../../general/network/NetworkStats/NetworkStats';
 import ContactCard from '../../../../general/network/ContactCard/ContactCard';
+import AddContactModal from '../../../../general/network/AddContactModal/AddContactModal';
 import '../../styles/shared-panel.css';
 import './NetworkPanel.css';
 
 /**
- * Network Panel Component (Right Panel)
+ * Network Panel Component (Right Panel) - SIMPLIFIED VERSION
  * 
  * Features:
  * - Network statistics with interactive filtering (NetworkStats component)
- * - Filtered contact list based on selected filter
+ * - Displays up to 12 filtered contacts based on selected filter
+ * - Simple "Show More" button that will navigate to full contacts page (future)
  * - Connection actions (Send Connection, Accept, Message)
  * 
  * Uses shared panel styles for consistency with CoursesPanel.
@@ -20,12 +23,22 @@ const NetworkPanel = ({
   filteredContacts = [], 
   contactFilter = 'all',
   onFilterChange,
+  onContactAdded,
   loading = false 
 }) => {
+  const navigate = useNavigate();
+  const [showAddContactModal, setShowAddContactModal] = useState(false);
 
-  const handleInviteContact = () => {
-    // TODO: Open invite modal
-    console.log('Invite contact');
+  const handleAddContact = () => {
+    setShowAddContactModal(true);
+  };
+
+  const handleContactAdded = (newContact) => {
+    // Close modal and notify parent
+    setShowAddContactModal(false);
+    if (onContactAdded) {
+      onContactAdded(newContact);
+    }
   };
 
   const handleConnectRequest = (contact) => {
@@ -44,6 +57,10 @@ const NetworkPanel = ({
     }
   };
 
+  const handleViewAllContacts = () => {
+    navigate('/network');
+  };
+
   const getSectionTitle = () => {
     switch (contactFilter) {
       case 'platform': return 'Recent Platform Contacts';
@@ -52,9 +69,12 @@ const NetworkPanel = ({
     }
   };
 
-  const handleViewAllContacts = () => {
-    // TODO: Navigate to full network page
-    console.log('View all contacts');
+  const getEmptyStateMessage = () => {
+    switch (contactFilter) {
+      case 'platform': return 'No platform contacts yet';
+      case 'manual': return 'No manual contacts yet';
+      default: return 'No contacts yet';
+    }
   };
 
   if (loading) {
@@ -77,49 +97,55 @@ const NetworkPanel = ({
         <IconButton 
           variant="primary" 
           size="small"
-          onClick={handleInviteContact}
+          onClick={handleAddContact}
           className="panel-header-action"
         >
-          + Invite
+          + Add Contact
         </IconButton>
       </div>
       
       <div className="panel-content">
         {/* Network Statistics - Minimal Size for Dashboard */}
         <NetworkStats 
-          stats={{
-            allContacts: networkStats.totalContacts || 0,
-            platformConnections: networkStats.platformConnections || 0,
-            manualContacts: networkStats.manualContacts || 0
-          }}
+          stats={networkStats}  // Pass stats directly - now uses standardized interface
           size="minimal"
           interactive={true}
           activeFilter={contactFilter}
           onFilterChange={handleFilterChange}
         />
 
-        {/* Recent Contacts */}
+        {/* Contacts List */}
         <div className="network-panel__section">
           <h3>{getSectionTitle()}</h3>
           {filteredContacts.length === 0 ? (
             <div className="panel-empty-state">
-              <p>No {contactFilter === 'all' ? 'contacts' : contactFilter + ' contacts'} yet</p>
-              <PrimaryButton onClick={handleInviteContact}>
-                Invite Your First Contact
+              <p>{getEmptyStateMessage()}</p>
+              <PrimaryButton onClick={handleAddContact}>
+                Add Your First Contact
               </PrimaryButton>
             </div>
           ) : (
-            <div className={`panel-list network-panel__contacts ${loading ? 'panel-list--loading' : ''}`}>
-              {filteredContacts.map(contact => (
-                <ContactCard
-                  key={contact.id}
-                  contact={contact}
-                  size="compact"
-                  onConnect={handleConnectRequest}
-                  onMessage={handleMessage}
-                />
-              ))}
-            </div>
+            <>
+              <div className={`panel-list network-panel__contacts ${loading ? 'panel-list--loading' : ''}`}>
+                {filteredContacts.map(contact => (
+                  <ContactCard
+                    key={contact.id}
+                    contact={contact}
+                    onConnect={handleConnectRequest}
+                    onMessage={handleMessage}
+                  />
+                ))}
+              </div>
+              
+              {/* Show More Information */}
+              {filteredContacts.length >= 12 && (
+                <div className="network-panel__show-more">
+                  <p className="show-more-hint">
+                    Showing first 12 contacts. 
+                  </p>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -132,6 +158,13 @@ const NetworkPanel = ({
           View All Contacts
         </SecondaryButton>
       </div>
+
+      {/* Add Contact Modal */}
+      <AddContactModal
+        isOpen={showAddContactModal}
+        onClose={() => setShowAddContactModal(false)}
+        onContactAdded={handleContactAdded}
+      />
     </div>
   );
 };

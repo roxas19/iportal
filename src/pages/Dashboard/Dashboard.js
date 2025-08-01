@@ -29,6 +29,7 @@ const Dashboard = () => {
         {/* Left Panel - Courses */}
         <CoursesPanel 
           courses={dashboardData.courses}
+          courseStats={dashboardData.courseStats}
           loading={dashboardData.loading}
           onCourseCreated={dashboardData.handleCourseCreated}
         />
@@ -39,6 +40,7 @@ const Dashboard = () => {
           filteredContacts={dashboardData.filteredContacts}
           contactFilter={dashboardData.contactFilter}
           onFilterChange={dashboardData.handleContactFilterChange}
+          onContactAdded={dashboardData.handleContactAdded}
           loading={dashboardData.loading}
         />
       </div>

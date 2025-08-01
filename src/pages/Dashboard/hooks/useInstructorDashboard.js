@@ -3,13 +3,13 @@ import { useAuth } from '../../../contexts/AuthContext';
 import api from '../../../services/api';
 
 /**
- * Instructor Dashboard Hook
+ * Instructor Dashboard Hook - SIMPLIFIED VERSION
  * 
  * Manages state and data for instructor-specific dashboard:
  * - Fetches instructor courses from /api/courses/instructor/courses/
- * - Fetches instructor contacts from /api/network/contacts/
+ * - Fetches first 12 contacts from /api/network/contacts/ (dashboard display only)
  * - Handles UI state like tabs, filters, and loading states
- * - Provides optimized data transformations and actions
+ * - Simple, clean implementation focused on dashboard needs
  */
 export const useInstructorDashboard = () => {
   const { user } = useAuth();
@@ -19,51 +19,30 @@ export const useInstructorDashboard = () => {
   
   // Data state
   const [courses, setCourses] = useState([]);
-  const [network, setNetwork] = useState({ contacts: [], pendingInvites: [] });
+  const [contacts, setContacts] = useState([]);  // Simple contacts array
+  const [contactStats, setContactStats] = useState({});  // Stats from backend
+  const [courseStats, setCourseStats] = useState({});  // Course stats from backend
   const [analytics, setAnalytics] = useState({});
   const [notifications, setNotifications] = useState([]);
   const [activityFeed, setActivityFeed] = useState([]);
   const [quickStats, setQuickStats] = useState({});
   const [recentActions, setRecentActions] = useState([]);
   
-  // Network filtering state (centralized)
+  // Network filtering state (simplified)
   const [contactFilter, setContactFilter] = useState('all');
 
-  // Memoized network calculations (avoid re-calculations on every render)
+  // Network stats from backend (no more client-side calculations)
   const networkStats = useMemo(() => ({
-    totalContacts: network.contacts.length,
-    platformConnections: network.contacts.filter(c => c.is_platform_user).length,
-    manualContacts: network.contacts.filter(c => !c.is_platform_user).length,
-    pendingInvites: network.pendingInvites.length
-  }), [network.contacts, network.pendingInvites]);
+    totalContacts: contactStats.total || 0,
+    platformConnections: contactStats.platform || 0,
+    manualContacts: contactStats.manual || 0,
+    pendingInvites: 0  // MVP: No pending invites yet
+  }), [contactStats]);
 
-  // Centralized filtering logic (moved from NetworkPanel)
-  const getFilteredContacts = useCallback((contacts, filter) => {
-    // Sort all contacts by created_at (most recent first)
-    const sortedContacts = [...contacts].sort((a, b) => 
-      new Date(b.created_at || b.updated_at || 0) - new Date(a.created_at || a.updated_at || 0)
-    );
-
-    switch (filter) {
-      case 'platform':
-        return sortedContacts.filter(c => c.is_platform_user).slice(0, 3);
-      case 'manual':
-        return sortedContacts.filter(c => !c.is_platform_user).slice(0, 3);
-      case 'all':
-      default:
-        return sortedContacts.slice(0, 3);
-    }
-  }, []);
-
+  // Contacts are now filtered on the server-side, so we just use them directly
   const filteredContacts = useMemo(() => {
-    return getFilteredContacts(network.contacts, contactFilter);
-  }, [network.contacts, contactFilter, getFilteredContacts]);
-
-  // Derived data for UI components (cleaned up)
-  const networkSummary = useMemo(() => ({
-    ...networkStats,
-    // Remove redundant recentConnections since we now have filteredContacts
-  }), [networkStats]);
+    return contacts;  // No client-side filtering needed
+  }, [contacts]);
 
   const quickActions = [
     { id: 'new-course', label: 'Create Course', icon: 'plus' },
@@ -71,26 +50,64 @@ export const useInstructorDashboard = () => {
     { id: 'view-analytics', label: 'View Analytics', icon: 'chart' }
   ];
 
-  // Load dashboard data (using real backend endpoints)
+  // Load dashboard data (simplified - just 12 contacts for dashboard display)
   const loadDashboardData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Call the real backend endpoints as specified by backend team
+      // Build contact API URL with filter_type if needed
+      const contactParams = new URLSearchParams({
+        sort: 'recent',  // Backend expects 'recent' not 'recency'
+        page: '1',
+        page_size: '12'
+      });
+      
+      // Add filter_type if not 'all'
+      if (contactFilter !== 'all') {
+        contactParams.append('filter_type', contactFilter);
+      }
+
+      // Load courses and contacts (first 12 only for dashboard)
       const [coursesRes, contactsRes] = await Promise.all([
-        api.get('/api/courses/instructor/courses/'),  // Backend endpoint for instructor courses
-        api.get('/api/network/contacts/')             // Backend endpoint for user contacts
+        api.get('/api/courses/instructor/courses/'),
+        api.get(`/api/network/contacts/?${contactParams.toString()}`)
       ]);
 
-      // Set courses data (already sorted by updated_at descending from backend)
-      setCourses(coursesRes.data || []);
+      // Set courses data
+      setCourses(coursesRes.data?.data?.courses || []);
       
-      // Set network data (contacts already filtered by user from backend)
-      setNetwork({ 
-        contacts: contactsRes.data || [], 
-        pendingInvites: [] // No pending invites endpoint for MVP
-      });
+      // Set course stats from backend
+      const courseStatsData = coursesRes.data?.data?.stats;
+      if (courseStatsData) {
+        setCourseStats(courseStatsData);
+      } else {
+        // Fallback to client calculation if stats not provided
+        const allCourses = coursesRes.data?.data?.courses || [];
+        setCourseStats({
+          total_courses: allCourses.length,
+          course_limit: 99,
+          remaining_courses: Math.max(0, 99 - allCourses.length)
+        });
+      }
+      
+      // Set contact data
+      const contactData = contactsRes.data?.data;
+      setContacts(contactData?.contacts || []);
+      
+      // Use stats from backend response (more efficient)
+      const backendStats = contactData?.stats;
+      if (backendStats) {
+        setContactStats(backendStats);
+      } else {
+        // Fallback to client calculation if stats not provided
+        const allContacts = contactData?.contacts || [];
+        setContactStats({
+          total: contactData?.pagination?.total_contacts || allContacts.length,
+          platform: allContacts.filter(c => c.is_platform_user).length,
+          manual: allContacts.filter(c => !c.is_platform_user).length
+        });
+      }
       
       // Placeholder defaults for components not yet integrated
       setAnalytics({});
@@ -105,7 +122,7 @@ export const useInstructorDashboard = () => {
     } finally {
       setLoading(false);
     }
-  }, []); // No dependencies needed - static logic
+  }, [contactFilter]);  // Add contactFilter dependency
 
   // Load data on mount and when user changes
   useEffect(() => {
@@ -146,6 +163,18 @@ export const useInstructorDashboard = () => {
     setCourses(prev => [newCourse, ...prev]);
   }, []);
 
+  // Optimistic update: add new contact
+  const handleContactAdded = useCallback((newContact) => {
+    setContacts(prev => [newContact, ...prev]); // Add to beginning (most recent)
+    
+    // Update stats
+    setContactStats(prev => ({
+      total: prev.total + 1,
+      platform: prev.platform + (newContact.is_platform_user ? 1 : 0),
+      manual: prev.manual + (newContact.is_platform_user ? 0 : 1)
+    }));
+  }, []);
+
   return {
     // UI State
     activeTab,
@@ -155,16 +184,17 @@ export const useInstructorDashboard = () => {
     
     // Data
     courses,
-    network,
+    contacts,  // Simple contacts array (12 for dashboard)
+    contactStats,  // Stats from backend
+    courseStats,  // Course stats from backend
     analytics,
     notifications,
     activityFeed,
     quickStats,
     recentActions,
     
-    // Network-specific data (centralized)
+    // Network-specific data (simplified)
     networkStats,
-    networkSummary,
     filteredContacts,
     contactFilter,
     
@@ -174,6 +204,7 @@ export const useInstructorDashboard = () => {
     handleContactFilterChange,
     refreshData,
     loadDashboardData,
-    handleCourseCreated
+    handleCourseCreated,
+    handleContactAdded
   };
 };
