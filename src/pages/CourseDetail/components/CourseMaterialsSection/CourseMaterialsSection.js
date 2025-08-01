@@ -15,7 +15,7 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { PrimaryButton, IconButton, SecondaryButton } from '../../../../general/buttons';
+import { PrimaryButton, IconButton } from '../../../../general/buttons';
 import MaterialCreateModal from '../MaterialCreateModal/MaterialCreateModal';
 import { getResourceTypeIcon, getResourceTypeLabel } from '../../../../general/constants';
 import { coursesAPI } from '../../../../services/api';
@@ -126,17 +126,19 @@ const CourseMaterialsSection = ({
   showCreateModal,
   setShowCreateModal
 }) => {
-  // Backend-connected state for material section
+  // State management
   const [materialSection, setMaterialSection] = useState(null);
   const [notesText, setNotesText] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
+  // Voice recording state
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [recordingTime, setRecordingTime] = useState(0);
   const [voiceNoteUrl, setVoiceNoteUrl] = useState(null);
   
-  // State for material editing
+  // Material editing state
   const [editingMaterial, setEditingMaterial] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   
@@ -155,7 +157,10 @@ const CourseMaterialsSection = ({
       const response = await coursesAPI.getCourseMaterialSection(courseId);
       
       if (response.data.success) {
-        setMaterialSection(response.data.data.material_section);
+        const section = response.data.data.material_section;
+        setMaterialSection(section);
+        setNotesText(section.instructor_notes || '');
+        setVoiceNoteUrl(section.voice_note);
       }
     } catch (err) {
       console.error('Error loading material section:', err);
@@ -169,16 +174,6 @@ const CourseMaterialsSection = ({
   useEffect(() => {
     loadMaterialSection();
   }, [loadMaterialSection]);
-  
-  // Update local notes when section loads
-  useEffect(() => {
-    if (materialSection?.instructor_notes) {
-      setNotesText(materialSection.instructor_notes);
-    }
-    if (materialSection?.voice_note) {
-      setVoiceNoteUrl(materialSection.voice_note);
-    }
-  }, [materialSection]);
 
   // Handle drag and drop reordering
   const handleDragEnd = async (event) => {
@@ -209,21 +204,12 @@ const CourseMaterialsSection = ({
     }
   };
 
-  const handleCreateMaterial = () => {
-    setShowCreateModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setShowCreateModal(false);
-  };
+  // Material handlers
+  const handleCreateMaterial = () => setShowCreateModal(true);
+  const handleCloseModal = () => setShowCreateModal(false);
 
   const handleMaterialCreated = async (materialData) => {
-    try {
-      await onCreateMaterial(materialData);
-    } catch (error) {
-      console.error('Failed to create material:', error);
-      throw error;
-    }
+    await onCreateMaterial(materialData);
   };
 
   const handleEditMaterial = (materialId) => {
@@ -236,29 +222,37 @@ const CourseMaterialsSection = ({
 
   const handleDeleteMaterial = async (materialId) => {
     if (window.confirm('Are you sure you want to delete this material? This action cannot be undone.')) {
-      try {
-        await onDeleteMaterial(materialId);
-      } catch (error) {
-        console.error('Failed to delete material:', error);
-      }
+      await onDeleteMaterial(materialId);
     }
   };
 
-  const handleToggleInstructorNotes = () => {
-    // Notes are always visible now - this function can be removed
+  const handleDownloadMaterial = (material) => {
+    const url = material.file || material.link;
+    if (url) window.open(url, '_blank');
+  };
+
+  const handleEditModalSubmit = async (materialData) => {
+    await onUpdateMaterial(editingMaterial.id, materialData);
+    setShowEditModal(false);
+    setEditingMaterial(null);
+  };
+
+  const handleEditModalClose = () => {
+    setShowEditModal(false);
+    setEditingMaterial(null);
   };
 
   const handleSaveNotes = async () => {
+    if (!materialSection?.id) return;
+    
     try {
       setLoading(true);
-      if (materialSection?.id) {
-        const response = await coursesAPI.updateCourseMaterialSection(materialSection.id, {
-          instructor_notes: notesText
-        });
-        
-        if (response.data.success) {
-          setMaterialSection(response.data.data.material_section);
-        }
+      const response = await coursesAPI.updateCourseMaterialSection(materialSection.id, {
+        instructor_notes: notesText
+      });
+      
+      if (response.data.success) {
+        setMaterialSection(response.data.data.material_section);
       }
       setError(null);
     } catch (err) {
@@ -269,28 +263,15 @@ const CourseMaterialsSection = ({
     }
   };
 
-  // Auto-save notes with debounce
-  useEffect(() => {
-    if (!notesText || notesText === materialSection?.instructor_notes) return;
-    
-    const timeoutId = setTimeout(() => {
-      handleSaveNotes();
-    }, 2000); // Auto-save after 2 seconds of no typing
-    
-    return () => clearTimeout(timeoutId);
-  }, [notesText, materialSection?.instructor_notes]);
 
   // Voice recording functionality
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream, { 
-        mimeType: 'audio/webm;codecs=opus' 
-      });
+      const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
       
       const chunks = [];
       recorder.ondataavailable = (e) => chunks.push(e.data);
-      
       recorder.onstop = async () => {
         const blob = new Blob(chunks, { type: 'audio/webm' });
         await uploadVoiceNote(blob);
@@ -302,18 +283,16 @@ const CourseMaterialsSection = ({
       setRecordingTime(0);
       recorder.start();
 
-      // Start recording timer
-      const timer = setInterval(() => {
+      // Timer with 2-minute limit
+      recorder.timer = setInterval(() => {
         setRecordingTime(prev => {
-          if (prev >= 120) { // 2 minutes limit
+          if (prev >= 120) {
             stopRecording();
             return 120;
           }
           return prev + 1;
         });
       }, 1000);
-
-      recorder.timer = timer;
     } catch (err) {
       console.error('Error starting recording:', err);
       setError('Could not access microphone. Please check permissions.');
@@ -330,18 +309,18 @@ const CourseMaterialsSection = ({
   };
 
   const uploadVoiceNote = async (audioBlob) => {
+    if (!materialSection?.id) return;
+    
     try {
       setLoading(true);
       const formData = new FormData();
       formData.append('voice_note', audioBlob, 'voice_note.webm');
       
-      if (materialSection?.id) {
-        const response = await coursesAPI.updateCourseMaterialSection(materialSection.id, formData);
-        
-        if (response.data.success) {
-          setMaterialSection(response.data.data.material_section);
-          setVoiceNoteUrl(response.data.data.material_section.voice_note);
-        }
+      const response = await coursesAPI.updateCourseMaterialSection(materialSection.id, formData);
+      
+      if (response.data.success) {
+        setMaterialSection(response.data.data.material_section);
+        setVoiceNoteUrl(response.data.data.material_section.voice_note);
       }
       setError(null);
     } catch (err) {
@@ -353,76 +332,50 @@ const CourseMaterialsSection = ({
   };
 
   const deleteVoiceNote = async () => {
-    if (window.confirm('Are you sure you want to delete this voice note?')) {
-      try {
-        setLoading(true);
-        if (materialSection?.id) {
-          const formData = new FormData();
-          formData.append('voice_note', ''); // Empty to delete
-          
-          const response = await coursesAPI.updateCourseMaterialSection(materialSection.id, formData);
-          
-          if (response.data.success) {
-            setMaterialSection(response.data.data.material_section);
-            setVoiceNoteUrl(null);
-          }
-        }
-        setError(null);
-      } catch (err) {
-        console.error('Error deleting voice note:', err);
-        setError('Failed to delete voice note. Please try again.');
-      } finally {
-        setLoading(false);
+    if (!window.confirm('Are you sure you want to delete this voice note?') || !materialSection?.id) return;
+    
+    try {
+      setLoading(true);
+      const formData = new FormData();
+      formData.append('voice_note', '');
+      
+      const response = await coursesAPI.updateCourseMaterialSection(materialSection.id, formData);
+      
+      if (response.data.success) {
+        setMaterialSection(response.data.data.material_section);
+        setVoiceNoteUrl(null);
       }
+      setError(null);
+    } catch (err) {
+      console.error('Error deleting voice note:', err);
+      setError('Failed to delete voice note. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
-    if (file) {
-      // Check file size (limit to 10MB)
-      if (file.size > 10 * 1024 * 1024) {
-        setError('File size must be less than 10MB');
-        return;
-      }
-      
-      // Check file type
-      if (!file.type.startsWith('audio/')) {
-        setError('Please upload an audio file');
-        return;
-      }
-      
-      await uploadVoiceNote(file);
+    if (!file) return;
+    
+    // Validation
+    if (file.size > 10 * 1024 * 1024) {
+      setError('File size must be less than 10MB');
+      return;
     }
+    
+    if (!file.type.startsWith('audio/')) {
+      setError('Please upload an audio file');
+      return;
+    }
+    
+    await uploadVoiceNote(file);
   };
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const handleDownloadMaterial = (material) => {
-    if (material.file) {
-      window.open(material.file, '_blank');
-    } else if (material.link) {
-      window.open(material.link, '_blank');
-    }
-  };
-
-  const handleEditModalSubmit = async (materialData) => {
-    try {
-      await onUpdateMaterial(editingMaterial.id, materialData);
-      setShowEditModal(false);
-      setEditingMaterial(null);
-    } catch (error) {
-      console.error('Failed to update material:', error);
-    }
-  };
-
-  const handleEditModalClose = () => {
-    setShowEditModal(false);
-    setEditingMaterial(null);
   };
 
   return (
@@ -441,83 +394,83 @@ const CourseMaterialsSection = ({
         </div>
       </div>
 
-      {/* Instructor Notes Section - Always Visible */}
-      <div className="instructor-notes-section">
-        <div className="notes-header">
-          <h4>📝 Instructor Notes</h4>
-          <p className="notes-subtitle">
-            Add context, instructions, or guidance for students about these materials
-          </p>
+      {/* Enhanced Instructor Notes Section */}
+      <div className="instructor-notes-compact">
+        <div className="notes-header-compact">
+          <div className="notes-title-group">
+            <h4>📝 Instructor Notes & Voice Context</h4>
+            <p className="notes-guidance">Add written instructions or record voice explanations for students</p>
+          </div>
         </div>
         
-        <div className="notes-content">
-          {error && (
-            <div className="notes-error">
-              <span className="error-text">{error}</span>
-            </div>
-          )}
-          
+        {error && (
+          <div className="error-banner">
+            {error}
+          </div>
+        )}
+        
+        <div className="notes-input-group">
           <textarea
             value={notesText}
             onChange={(e) => setNotesText(e.target.value)}
-            placeholder="No instructor notes yet. Add context or instructions for students about these course materials..."
-            className="notes-textarea"
-            rows="4"
+            placeholder="Provide context, learning objectives, or special instructions for these materials..."
+            className="notes-textarea-compact"
+            rows="3"
             disabled={loading}
           />
-          
-          {/* Voice Notes Controls */}
-          <div className="voice-notes-controls">
-            <div className="voice-actions">
-              {!isRecording ? (
-                <button
-                  className="voice-btn record-btn"
-                  onClick={startRecording}
-                  disabled={loading}
-                  title="Record voice note (2 min max)"
-                >
-                  🎤 Record ({formatTime(120)})
-                </button>
-              ) : (
-                <button
-                  className="voice-btn recording-btn"
-                  onClick={stopRecording}
-                  title="Stop recording"
-                >
-                  ⏹️ Stop ({formatTime(recordingTime)})
-                </button>
-              )}
-              
-              <label className="voice-btn upload-btn" title="Upload audio file">
-                📁 Upload
-                <input
-                  type="file"
-                  accept="audio/*"
-                  onChange={handleFileUpload}
-                  style={{ display: 'none' }}
-                  disabled={loading}
-                />
-              </label>
-            </div>
-            
-            {/* Voice Note Player */}
-            {voiceNoteUrl && (
-              <div className="voice-player">
-                <audio controls src={voiceNoteUrl} className="audio-player">
-                  Your browser does not support audio playback.
-                </audio>
-                <button
-                  className="voice-btn delete-btn"
-                  onClick={deleteVoiceNote}
-                  disabled={loading}
-                  title="Delete voice note"
-                >
-                  🗑️
-                </button>
-              </div>
-            )}
+          <button
+            className="save-notes-btn"
+            onClick={handleSaveNotes}
+            disabled={loading || !materialSection?.id}
+            title="Save notes"
+          >
+            {loading ? 'Saving...' : 'Save Notes'}
+          </button>
+        </div>
+        
+        <div className="voice-section">
+          <span className="voice-label">Voice annotations:</span>
+          <div className="voice-actions-inline">
+            <button
+              className={`voice-action-btn ${isRecording ? 'recording' : 'record'}`}
+              onClick={isRecording ? stopRecording : startRecording}
+              disabled={loading}
+              title={isRecording ? "Stop recording" : "Record voice explanation (2 min max)"}
+            >
+              {isRecording ? `⏹️ Stop ${formatTime(recordingTime)}` : '🎤 Record explanation'}
+            </button>
+            <label className="voice-action-btn upload" title="Upload audio explanation">
+              📁 Upload audio
+              <input
+                type="file"
+                accept="audio/*"
+                onChange={handleFileUpload}
+                style={{ display: 'none' }}
+                disabled={loading}
+              />
+            </label>
           </div>
         </div>
+        
+        {/* Voice Note Player - Only shows when exists */}
+        {voiceNoteUrl && (
+          <div className="voice-player-compact">
+            <div className="voice-player-info">
+              <span>🎵 Voice explanation:</span>
+              <button
+                className="delete-voice-btn"
+                onClick={deleteVoiceNote}
+                disabled={loading}
+                title="Remove voice explanation"
+              >
+                Remove
+              </button>
+            </div>
+            <audio controls src={voiceNoteUrl} className="audio-compact">
+              Your browser does not support audio playback.
+            </audio>
+          </div>
+        )}
       </div>
 
       {/* Materials List */}
